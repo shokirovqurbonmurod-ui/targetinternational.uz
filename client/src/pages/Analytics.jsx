@@ -238,7 +238,7 @@ E'tibor talab qiladi: ${insights.falling.length} ta o'quvchi (past streak yoki p
   function exportMonthly() {
     const now = new Date();
     const L = [
-      'ISO TERMIZY AVLODLARI — OYLIK HISOBOT',
+      'TARGET INTERNATIONAL SCHOOL — OYLIK HISOBOT',
       `Sana: ${now.toISOString().slice(0, 10)}`,
       '='.repeat(50), '',
       `O'quvchilar: ${d.s?.students || 0} (faol: ${d.s?.activeStudents || 0})`,

@@ -14,7 +14,7 @@ export function downloadCertificatePdf({ student, course, level, serial, date })
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(198, 161, 91);
-  doc.text('ISO TERMIZY AVLODLARI', cx, 35, { align: 'center' });
+  doc.text('TARGET INTERNATIONAL SCHOOL', cx, 35, { align: 'center' });
   doc.setFontSize(9);
   doc.setTextColor(120, 120, 120);
   doc.text("Xorijiy tillar o'quv markazi", cx, 42, { align: 'center' });

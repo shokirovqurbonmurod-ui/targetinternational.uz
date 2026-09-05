@@ -9,7 +9,7 @@ export function downloadReceiptPdf(payment, student) {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('ISO Termizy Avlodlari', cx, y, { align: 'center' });
+  doc.text('Target International School', cx, y, { align: 'center' });
   y += 5;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
@@ -95,7 +95,7 @@ export function printReceipt({ studentName, groupName, type, amount, reason, dat
 </head>
 <body>
   <div class="brand">
-    <div class="name">ISO Termizy Avlodlari</div>
+    <div class="name">Target International School</div>
     <div class="sub">Xorijiy tillar o'quv markazi · Sherobod</div>
   </div>
   <hr />

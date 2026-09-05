@@ -63,7 +63,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="font-display text-2xl text-white">{greeting}, {firstName}!</h1>
-              <p className="text-navy-200 text-sm mt-0.5 max-w-lg">ISO Termizy platformangizga xush kelibsiz. Yangi AI yordamchi, CRM va LMS funksiyalari bilan ishlashingizni soddalashtiraylik.</p>
+              <p className="text-navy-200 text-sm mt-0.5 max-w-lg">Target Inernational School platformangizga xush kelibsiz. Yangi AI yordamchi, CRM va LMS funksiyalari bilan ishlashingizni soddalashtiraylik.</p>
             </div>
           </div>
           <button onClick={() => navigate('/app/ai-assistant')} className="btn bg-white/95 text-navy-800 hover:bg-white shrink-0">
@@ -110,7 +110,7 @@ export default function Dashboard() {
             <ArrowRight size={16} className="opacity-70 group-hover:translate-x-0.5 transition-transform" />
           </div>
           <div className="relative text-[10px] font-bold uppercase tracking-wider text-white/70">AI Yordamchi</div>
-          <div className="relative font-display text-lg leading-tight mt-0.5">ISO Termizy AI</div>
+          <div className="relative font-display text-lg leading-tight mt-0.5">Target International School AI</div>
         </button>
       </div>
 

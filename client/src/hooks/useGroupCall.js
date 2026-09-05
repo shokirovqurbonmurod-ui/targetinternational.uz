@@ -20,6 +20,10 @@ export function useGroupCall({ channel, myName, enabled }) {
   const lastIdRef = useRef(0);
   const inCallRef = useRef(false);
   const kindRef = useRef('audio');
+  // Har bir ishtirokchi bilan ulanish hali o'rnatilmagan paytda kelgan ICE nomzodlarini
+  // shu yerda saqlab turamiz ({ name: [candidate, ...] }) — aks holda ular yo'qolib, o'sha
+  // kishi bilan ulanish hech qachon o'rnatilmasdi (useCall.js'dagi bilan bir xil xato).
+  const pendingIceRef = useRef({});
 
   useEffect(() => { inCallRef.current = inCall; }, [inCall]);
   useEffect(() => { kindRef.current = callKind; }, [callKind]);
@@ -45,7 +49,16 @@ export function useGroupCall({ channel, myName, enabled }) {
   function removePeer(name) {
     pcsRef.current[name]?.close();
     delete pcsRef.current[name];
+    delete pendingIceRef.current[name];
     setParticipants((p) => { const n = { ...p }; delete n[name]; return n; });
+  }
+
+  async function flushPendingIce(name) {
+    const pc = pcsRef.current[name];
+    if (!pc || !pc.remoteDescription) return;
+    const queued = pendingIceRef.current[name] || [];
+    delete pendingIceRef.current[name];
+    for (const cand of queued) await pc.addIceCandidate(new RTCIceCandidate(cand)).catch(() => {});
   }
 
   // Kim bilan alohida bog'lanmasam ham, kanalda hozir nechta kishi qo'ng'iroqda ekanini ko'rsatib turadi.
@@ -69,15 +82,19 @@ export function useGroupCall({ channel, myName, enabled }) {
         if (s.type === 'group-offer') {
           const pc = pcsRef.current[s.from] || createPeer(s.from);
           await pc.setRemoteDescription(new RTCSessionDescription({ sdp: s.payload.sdp, type: s.payload.type }));
+          await flushPendingIce(s.from);
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
           sendSignal(s.from, 'group-answer', { sdp: answer.sdp, type: answer.type });
         } else if (s.type === 'group-answer') {
           const pc = pcsRef.current[s.from];
           if (pc) await pc.setRemoteDescription(new RTCSessionDescription({ sdp: s.payload.sdp, type: s.payload.type }));
+          await flushPendingIce(s.from);
         } else if (s.type === 'group-ice') {
           const pc = pcsRef.current[s.from];
-          if (pc && s.payload) await pc.addIceCandidate(new RTCIceCandidate(s.payload)).catch(() => {});
+          if (!s.payload) { /* no-op */ }
+          else if (pc && pc.remoteDescription) await pc.addIceCandidate(new RTCIceCandidate(s.payload)).catch(() => {});
+          else (pendingIceRef.current[s.from] ||= []).push(s.payload);
         } else if (s.type === 'group-leave') {
           removePeer(s.from);
         }
@@ -90,6 +107,11 @@ export function useGroupCall({ channel, myName, enabled }) {
   async function join(kind) {
     setCallError('');
     try {
+      // Signal tinglash boshlanishidan OLDIN shu kanaldagi eng oxirgi signal id'sidan boshlab
+      // kuzatishni sozlaymiz — aks holda kanalning butun eski qo'ng'iroq tarixi (masalan boshqa
+      // kunlardagi eski offer/ice'lar) qayta o'qib chiqilib, holatni chalkashtirib qo'yishi mumkin edi.
+      const priorSignals = await api.get(`/call_signals?channel=${encodeURIComponent(channel)}`).catch(() => []);
+      lastIdRef.current = (priorSignals || []).reduce((m, r) => Math.max(m, Number(r.id) || 0), 0);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: kind === 'video' });
       localStreamRef.current = stream;
       setCallKind(kind);
@@ -109,6 +131,7 @@ export function useGroupCall({ channel, myName, enabled }) {
   function leave() {
     for (const name of Object.keys(pcsRef.current)) { sendSignal(name, 'group-leave', null); pcsRef.current[name].close(); }
     pcsRef.current = {};
+    pendingIceRef.current = {};
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
     localStreamRef.current = null;
     setParticipants({});

@@ -5,7 +5,7 @@ import { api } from '../lib/api.js';
 import { PageHeader, Modal, Empty } from '../components/ui.jsx';
 
 const MODEL_URL = '/models';
-const MATCH_THRESHOLD = 0.55; // qancha kichik bo'lsa, shuncha qat'iy taqqoslash
+const MATCH_THRESHOLD = 0.72; // yuqori narx/yorug'lik/ko'z-yuz burchagi farqi bo'lsa ham tanishni osonroq qilish
 const DETECT_INTERVAL_MS = 700;
 const IP_CAMERA_KEY = 'iso_ip_camera_url';
 

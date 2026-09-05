@@ -9,7 +9,7 @@ export function downloadReportCardPdf({ studentName, groupName, periodLabel, att
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
-  doc.text('ISO Termizy Avlodlari', cx, y, { align: 'center' });
+  doc.text('Target International School', cx, y, { align: 'center' });
   y += 6;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);

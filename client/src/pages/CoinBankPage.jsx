@@ -12,7 +12,9 @@ const TIERS = [
 ];
 
 function daysHeld(depositedAt) {
-  return Math.floor((Date.now() - new Date(depositedAt.replace(' ', 'T')).getTime()) / (24 * 60 * 60 * 1000));
+  // Server vaqti UTC (Z qirqilgan) — qayta 'Z' qo'shmasak brauzer mahalliy vaqt deb o'qib,
+  // soat mintaqasi farqi kunlar hisobini bir kunga surib yuborishi mumkin edi.
+  return Math.floor((Date.now() - new Date(depositedAt.replace(' ', 'T') + 'Z').getTime()) / (24 * 60 * 60 * 1000));
 }
 function tierFor(days) {
   if (days >= 30) return TIERS[3];

@@ -69,9 +69,19 @@ export default function Login() {
         <div className="absolute left-0 bottom-0 w-[400px] h-[400px] rounded-full bg-gold/5 blur-[80px]" />
         <div className="absolute right-10 bottom-24 w-40 h-40 rounded-full bg-blue-400/[.06] blur-[60px]" />
 
-        <div className="relative flex items-center gap-3">
-          <img src="/logo.png" alt="ISO" className="w-12 h-12 rounded-xl object-cover bg-white/90 p-0.5 shadow-lg" />
-          <div className="font-display text-2xl"><span className="text-gold-300">ISO</span> Termizy Avlodlari</div>
+        <div className="relative flex items-center gap-4">
+          <div className="relative shrink-0 w-20 h-20 rounded-full border-[4px] border-navy-700 bg-navy-900 shadow-inner">
+            <div className="absolute inset-[18%] rounded-full border border-white/50" />
+            <div className="absolute inset-0 flex items-center justify-center"><div className="w-[3px] h-full bg-red-500/90" /></div>
+            <div className="absolute inset-0 flex items-center justify-center"><div className="h-[3px] w-full bg-red-500/90" /></div>
+            <div className="absolute inset-[25%] rounded-full border-[3px] border-red-500/80" />
+          </div>
+          <div className="leading-none text-white">
+            <div className="font-black tracking-[-0.08em] text-5xl">
+              <span className="text-red-500">TAR</span><span className="text-white">GET</span>
+            </div>
+            <div className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-gold-200">International School</div>
+          </div>
         </div>
 
         <div className="relative">
@@ -90,7 +100,7 @@ export default function Login() {
             ))}
           </div>
         </div>
-        <div className="relative text-xs text-navy-400">© 2026 ISO Termizy Avlodlari · Sherobod</div>
+        <div className="relative text-xs text-navy-400">© 2026 Target Inernational School · Sherobod</div>
       </div>
 
       {/* O'ng tomon — faqat kirish formasi */}
@@ -98,8 +108,18 @@ export default function Login() {
         <div className="w-full max-w-sm animate-fade">
           {/* Mobil logo */}
           <div className="lg:hidden flex flex-col items-center gap-3 mb-8">
-            <img src="/logo.png" alt="ISO" className="w-14 h-14 rounded-xl object-cover shadow" />
-            <div className="font-display text-xl text-navy-800 text-center"><span className="text-gold-600">ISO</span> Termizy Avlodlari</div>
+            <div className="relative w-14 h-14 rounded-full border-[3px] border-navy-700 bg-navy-900 shadow-inner">
+              <div className="absolute inset-[18%] rounded-full border border-white/50" />
+              <div className="absolute inset-0 flex items-center justify-center"><div className="w-[2px] h-full bg-red-500/90" /></div>
+              <div className="absolute inset-0 flex items-center justify-center"><div className="h-[2px] w-full bg-red-500/90" /></div>
+              <div className="absolute inset-[25%] rounded-full border-[2px] border-red-500/80" />
+            </div>
+            <div className="leading-none text-center">
+              <div className="font-black tracking-[-0.08em] text-3xl text-navy-800">
+                <span className="text-red-500">TAR</span><span className="text-navy-900">GET</span>
+              </div>
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-navy-500">International School</div>
+            </div>
             <p className="text-xs text-navy-400">Xorijiy tillar o'quv markazi</p>
           </div>
 
@@ -142,7 +162,7 @@ export default function Login() {
               </button>
             </form>
           </div>
-          <p className="text-center text-xs text-navy-300 mt-5">✨ ISO Termizy AI yordamchisi sizni kutmoqda</p>
+          <p className="text-center text-xs text-navy-300 mt-5">✨ Target International School AI yordamchisi sizni kutmoqda</p>
         </div>
       </div>
     </div>

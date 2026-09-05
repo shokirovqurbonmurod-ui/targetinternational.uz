@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Settings as SettingsIcon, User, Palette, Globe, Shield, Database, Info, Bot, Check, Send, UserPlus, Trash2, RefreshCw } from 'lucide-react';
+import { Settings as SettingsIcon, User, Palette, Globe, Shield, Database, Info, Bot, Check, Send, UserPlus, Trash2, RefreshCw, Camera } from 'lucide-react';
 import { PageHeader } from '../components/ui.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { roleLabel, roleColor, isAdmin } from '../config/roles.js';
@@ -18,13 +18,7 @@ export default function Settings() {
             <User size={18} className="text-gold" />
             <h3 className="font-display text-lg">Profil</h3>
           </div>
-          <div className="flex items-center gap-4 mb-6 p-4 rounded-2xl bg-gradient-to-r from-navy-50 to-gold-50/30">
-            <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 text-white text-2xl font-bold shadow-lg">{user.full_name[0]}</div>
-            <div>
-              <div className="font-bold text-navy-800 text-lg">{user.full_name}</div>
-              <span className={`chip ${roleColor(user.role)} shadow-sm`}>{roleLabel(user.role)}</span>
-            </div>
-          </div>
+          <ProfileCard user={user} />
           <div className="space-y-3 text-sm">
             <Row icon="📞" title="Telefon" value={user.phone} />
             <Row icon="🏢" title="Filial" value={user.branch || 'Sherobod — Bosh filial'} />
@@ -68,7 +62,7 @@ export default function Settings() {
               <h3 className="font-display text-lg">Tizim</h3>
             </div>
             <div className="space-y-2">
-              <SettingRow icon="📦" title="Versiya" value="ISO Termizy LMS v9.0 Premium" />
+              <SettingRow icon="📦" title="Versiya" value="Target International School LMS v9.0 Premium" />
               <SettingRow icon="📊" title="Modullar" value="100 ta menyu" />
               <SettingRow icon="💾" title="Ma'lumotlar" value="JSON-fayl bazasi (server/data/)" />
               <SettingRow icon="🏢" title="Bosh filial" value="Sherobod" />
@@ -77,6 +71,68 @@ export default function Settings() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ProfileCard({ user }) {
+  const { updateProfile } = useAuth();
+  const [uploading, setUploading] = useState(false);
+  const [bio, setBio] = useState(user.bio || '');
+  const [savingBio, setSavingBio] = useState(false);
+  const [bioSaved, setBioSaved] = useState(false);
+
+  async function handlePhoto(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await api.upload(file);
+      await updateProfile({ avatar_url: res.url });
+    } catch (err) { alert(err.message); }
+    setUploading(false);
+  }
+
+  async function saveBio() {
+    setSavingBio(true);
+    try {
+      await updateProfile({ bio });
+      setBioSaved(true);
+      setTimeout(() => setBioSaved(false), 2000);
+    } catch (err) { alert(err.message); }
+    setSavingBio(false);
+  }
+
+  return (
+    <>
+      <div className="flex items-center gap-4 mb-4 p-4 rounded-2xl bg-gradient-to-r from-navy-50 to-gold-50/30">
+        <div className="relative shrink-0">
+          {user.avatar_url ? (
+            <img src={api.fileUrl(user.avatar_url)} alt={user.full_name} className="w-16 h-16 rounded-2xl object-cover shadow-lg" />
+          ) : (
+            <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 text-white text-2xl font-bold shadow-lg">{user.full_name[0]}</div>
+          )}
+          <label className="absolute -bottom-1 -right-1 grid place-items-center w-6 h-6 rounded-full bg-navy-800 text-white shadow-md cursor-pointer hover:bg-navy-700 transition">
+            {uploading ? <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <Camera size={11} />}
+            <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={uploading} />
+          </label>
+        </div>
+        <div>
+          <div className="font-bold text-navy-800 text-lg">{user.full_name}</div>
+          <span className={`chip ${roleColor(user.role)} shadow-sm`}>{roleLabel(user.role)}</span>
+        </div>
+      </div>
+      <div className="mb-6">
+        <label className="label">Bio</label>
+        <textarea className="input !py-2.5 w-full resize-none" rows={2} maxLength={300}
+          placeholder="O'zingiz haqingizda qisqacha..." value={bio} onChange={(e) => setBio(e.target.value)} />
+        <div className="flex justify-end mt-1.5">
+          <button onClick={saveBio} disabled={savingBio || bio === (user.bio || '')} className="btn-ghost !py-1.5 !px-3 text-xs disabled:opacity-40">
+            {bioSaved ? <><Check size={13} /> Saqlandi</> : savingBio ? 'Saqlanmoqda...' : 'Bio saqlash'}
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -117,7 +173,7 @@ function AiModelCard() {
     <div className="card p-5">
       <div className="flex items-center gap-2 mb-4 text-navy-800">
         <Bot size={18} className="text-gold" />
-        <h3 className="font-display text-lg">ISO Termizy AI modeli</h3>
+        <h3 className="font-display text-lg">Target International School AI modeli</h3>
       </div>
       {models === null ? (
         <p className="text-sm text-navy-400">Yuklanmoqda...</p>

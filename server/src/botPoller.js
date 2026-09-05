@@ -83,7 +83,7 @@ export async function sendMessage(chatId, text, messageThreadId, replyMarkup) {
 // qanday huquq ololmaydi, faqat unga mos yo'riqnoma matnini ko'radi.
 const ONBOARD_ROLES = [
   { key: 'student', label: "🎓 O'quvchi", desc: "coin balans, dars jadvali, uy vazifa, davomat, imtihon natijalari" },
-  { key: 'teacher', label: "👨‍🏫 O'qituvchi", desc: "guruh yangiliklari, e'lonlar, ota-onalar bilan aloqa" },
+  { key: 'teacher', label: "👨‍🏫 O'qituvchi", desc: "guruh yangiliklari, e'lonlar, ota-onalar bilan aloqa, shaxsiy AI yordamchi (oddiy savol yozing)" },
   { key: 'admin', label: '🧑‍💼 Xodim / Admin', desc: "e'lon yuborish, hisobotlar, tizim bildirishnomalari" },
   { key: 'director', label: '🏛 Direktor / Rahbariyat', desc: "moliya hisobot, statistika, umumiy xabar yuborish (/broadcast)" },
 ];
@@ -220,6 +220,94 @@ async function askAI(question) {
   } catch { return null; }
 }
 
+// "O'qituvchi Yordamchi" — shaxsiy chatda o'qituvchi buyruq emas, oddiy savol yozganda ishlaydigan
+// haqiqiy AI agent. Guruh Savol-javob rejimidagi umumiy "Yordamchi Ustoz"dan farqi: bu faqat
+// o'sha o'qituvchining O'ZI bilan gaplashadi, uning haqiqiy guruh/o'quvchi ma'lumotlariga ega va
+// suhbat tarixini eslab qoladi (bot_ai_sessions). Tizimda hech narsani o'zgartira olmaydi — faqat
+// maslahat/ma'lumot beradi, harakatni tizimning tegishli bo'limiga yo'naltiradi.
+const TEACHER_AGENT_SYSTEM = `Sen "O'qituvchi Yordamchi" — "ISO Termizy Avlodlari" o'quv markazi Telegram botidagi shaxsiy AI agentisan. Faqat shu bitta o'qituvchi bilan suhbatlashasan.
+Vazifang: o'qituvchiga kundalik ishida yordam berish — uning guruhlari, o'quvchilari, ularning progressi/davomati haqida ANIQ ma'lumot bilan javob berish, ota-onaga yozish uchun xabar matni tayyorlab berish, dars/tushuntirish g'oyalari taklif qilish, qaysi o'quvchiga ko'proq e'tibor kerakligini aytish.
+Javobni o'zbek tilida (savol boshqa tilda bo'lsa o'sha tilda), qisqa va aniq ber (100-250 so'z, faqat murakkab so'rovda ko'proq).
+Pastda senga o'qituvchining HAQIQIY guruh/o'quvchi ma'lumotlari beriladi — javob shu mavzuga tegishli bo'lsa ANIQ ism va raqamlar bilan javob ber, aks holda ma'lumotlarga ishora qilma.
+Sen tizimda hech narsani o'zgartira olmaysan (baho qo'ya olmaysan, xabar yubora olmaysan, coin bera olmaysan) — faqat maslahat/matn tayyorlab berasan; amal bajarish so'ralsa, buni tizimning tegishli bo'limi (masalan "Baholar kitobi" yoki "Coin berish") orqali qilishni tavsiya qil.
+To'g'ridan-to'g'ri javobdan boshla, "albatta yordam beraman" kabi ortiqcha kirish gap yozma.`;
+
+// O'qituvchining haqiqiy guruh/o'quvchi/KPI ma'lumotlaridan qisqa kontekst — AI shu asosda
+// aniq ism va raqamlar bilan javob bera oladi (ai.js'dagi buildDataContext bilan bir xil mantiq).
+function buildTeacherContext(link) {
+  const groups = store.all('groups').filter((g) => g.teacher === link.user_name);
+  const groupNames = groups.map((g) => g.name);
+  const students = store.all('students').filter((s) => groupNames.includes(s.group_name));
+  const avgProgress = Math.round(students.reduce((a, s) => a + (Number(s.progress) || 0), 0) / (students.length || 1));
+  const weak = students.filter((s) => (s.progress || 0) < 40 || (s.streak || 0) <= 2);
+  const top = [...students].sort((a, b) => (b.progress || 0) - (a.progress || 0)).slice(0, 5);
+  const kpi = store.all('teacher_kpi').filter((k) => k.teacher === link.user_name)
+    .sort((a, b) => (b.period || '').localeCompare(a.period || ''))[0];
+
+  const lines = [];
+  lines.push(`GURUHLARI: ${groupNames.join(', ') || 'topilmadi'}.`);
+  lines.push(`JAMI O'QUVCHI: ${students.length} ta, o'rtacha progress ${Number.isFinite(avgProgress) ? avgProgress : 0}%.`);
+  lines.push(`E'TIBOR TALAB QILUVCHILAR: ${weak.slice(0, 10).map((s) => `${s.full_name} (${s.progress ?? 0}%, streak ${s.streak ?? 0} kun, guruh: ${s.group_name})`).join('; ') || "yo'q"}.`);
+  lines.push(`ENG FAOL O'QUVCHILAR: ${top.map((s) => `${s.full_name} (${s.progress ?? 0}%)`).join('; ') || "yo'q"}.`);
+  if (kpi) lines.push(`OXIRGI KPI (${kpi.period}): ${kpi.score} ball.`);
+  return lines.join('\n');
+}
+
+function getSessionHistory(chatId) {
+  const row = store.where('bot_ai_sessions', (s) => s.chat_id === String(chatId))[0];
+  if (!row) return [];
+  try { return JSON.parse(row.history || '[]'); } catch { return []; }
+}
+
+function saveSessionHistory(chatId, history) {
+  const trimmed = history.slice(-12); // oxirgi 6 juftlik (savol+javob) — kontekst uzunligi cheklangan
+  const existing = store.where('bot_ai_sessions', (s) => s.chat_id === String(chatId))[0];
+  const payload = { chat_id: String(chatId), history: JSON.stringify(trimmed), updated_at: now() };
+  if (existing) store.update('bot_ai_sessions', existing.id, payload);
+  else store.insert('bot_ai_sessions', payload);
+}
+
+// O'qituvchi shaxsiy chatda oddiy (buyruqsiz) savol yozganda chaqiriladi — suhbat tarixi va
+// haqiqiy ma'lumotlar bilan javob beradi, keyin ai_chat_log'ga yozadi (auditda ham ko'rinsin).
+async function askTeacherAgent(question, link) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return "AI hali ulanmagan — administrator OPENROUTER_API_KEY sozlashi kerak.";
+  const model = store.all('ai_settings')[0]?.model || process.env.OPENROUTER_MODEL || 'openai/gpt-oss-20b:free';
+  const context = buildTeacherContext(link);
+  const systemText = `${TEACHER_AGENT_SYSTEM}\n\n--- SIZNING MA'LUMOTLARINGIZ ---\nO'qituvchi: ${link.user_name}.\n${context}\n--- MA'LUMOTLAR TUGADI ---`;
+  const history = getSessionHistory(link.chat_id);
+  const messages = [{ role: 'system', content: systemText }];
+  for (const turn of history.slice(-10)) messages.push({ role: turn.role, content: turn.content });
+  messages.push({ role: 'user', content: question });
+
+  try {
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://iso-termizy-avlodlari.local',
+        'X-Title': 'ISO Termizy AI',
+      },
+      body: JSON.stringify({ model, messages, temperature: 0.6, max_tokens: 700 }),
+    });
+    if (!resp.ok) return "AI hozir band yoki xatolik yuz berdi — birozdan so'ng qayta urinib ko'ring.";
+    const data = await resp.json();
+    const answer = data?.choices?.[0]?.message?.content?.trim();
+    if (!answer) return "AI javob bera olmadi. Qayta urinib ko'ring.";
+
+    saveSessionHistory(link.chat_id, [...history, { role: 'user', content: question }, { role: 'assistant', content: answer }]);
+    store.insert('ai_chat_log', {
+      user: link.user_name, role: link.role, session: `bot_${link.chat_id}`,
+      message: question, reply: answer, model,
+      prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost_usd: 0, cost_uzs: 0, at: now(),
+    });
+    return answer;
+  } catch (e) {
+    return "AI bilan bog'lanishda xatolik: " + e.message;
+  }
+}
+
 const BUILTIN_COMMANDS = [
   { command: 'start', description: 'Hisobni ulash' },
   { command: 'balance', description: 'Coin va ball balansi' },
@@ -277,6 +365,7 @@ function helpText() {
     "👥 /mygroups — guruhlarim",
     "🎓 /mystudents — o'quvchilarim soni",
     "📊 /kpi — KPI ko'rsatkichim",
+    "🤖 Yoki menga oddiy savol yozing (masalan: \"Ali haqida ayt\", \"kim davomat qilmadi?\", \"ota-onaga xabar yoz\") — men sizning AI yordamchingizman, guruhingiz va o'quvchilaringiz haqida real ma'lumot bilan javob beraman.",
     "",
     "🏛 Rahbariyat/moliya:",
     "📊 /finance — qarzdorlar va oylik tushum",
@@ -774,6 +863,16 @@ async function handleMessage(msg) {
   if (reply) {
     reactTo(chatId, msg.message_id, REACTIONS.ok);
     return sendMessage(chatId, reply, null, cmdName === 'help' ? mainMenuKeyboard(link.role) : undefined);
+  }
+
+  // Buyruqlardan hech biriga mos kelmadi — agar bu o'qituvchi va matn "/" bilan boshlanmagan bo'lsa
+  // (ya'ni haqiqiy erkin savol, xato buyruq emas), "Noma'lum buyruq" o'rniga uni O'qituvchi
+  // Yordamchi AI agentiga yo'naltiramiz — bot endi faqat tugma bosishga emas, suhbatga ham javob beradi.
+  if (TEACHER_ROLES.includes(link.role) && !text.startsWith('/')) {
+    sendChatAction(chatId, 'typing');
+    const answer = await askTeacherAgent(text, link);
+    reactTo(chatId, msg.message_id, REACTIONS.answered);
+    return sendMessage(chatId, answer);
   }
 
   reactTo(chatId, msg.message_id, REACTIONS.unknown);

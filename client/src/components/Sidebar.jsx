@@ -58,13 +58,22 @@ export default function Sidebar({ onNavigate }) {
   return (
     <aside className="w-[272px] shrink-0 h-full bg-gradient-to-b from-navy-800 via-navy-900 to-[#0A1020] text-navy-100 flex flex-col border-r border-white/5">
       {/* Brand */}
-      <div className="flex items-center gap-3 px-5 h-[68px] border-b border-white/8">
-        <img src="/logo.png" alt="ISO Termizy" className="w-10 h-10 rounded-xl object-cover bg-white/90 p-0.5 shadow-md" />
-        <div className="leading-tight">
-          <div className="font-display text-lg text-white">
-            <span className="text-gold-300">ISO</span> Termizy
+      <div className="flex items-center gap-3 px-4 h-[68px] border-b border-white/8">
+        <div className="relative shrink-0 w-11 h-11 rounded-full border-[3px] border-navy-700 bg-navy-900 shadow-inner">
+          <div className="absolute inset-[18%] rounded-full border border-white/50" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[2px] h-full bg-red-500/90" />
           </div>
-          <div className="text-[10px] text-navy-300/70 font-medium tracking-wider -mt-0.5">XORIJIY TILLAR · LMS</div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-[2px] w-full bg-red-500/90" />
+          </div>
+          <div className="absolute inset-[25%] rounded-full border-[2px] border-red-500/80" />
+        </div>
+        <div className="leading-none">
+          <div className="font-black tracking-[-0.06em] text-[18px]">
+            <span className="text-red-500">TAR</span><span className="text-white">GET</span>
+          </div>
+          <div className="mt-0.5 text-[8px] text-navy-300/80 font-bold uppercase tracking-[0.18em]">International School</div>
         </div>
       </div>
 
@@ -135,7 +144,7 @@ export default function Sidebar({ onNavigate }) {
       </nav>
 
       <div className="px-5 py-3 border-t border-white/5 text-[10px] text-navy-400/50 font-medium">
-        ISO Termizy Avlodlari © 2026
+        Target Inernational School © 2026
       </div>
     </aside>
   );

@@ -43,8 +43,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  async function updateProfile(patch) {
+    const res = await api.put('/auth/profile', patch);
+    setUser((u) => ({ ...u, ...res }));
+    return res;
+  }
+
   return (
-    <AuthCtx.Provider value={{ user, loading, login, logout, roleOverrides, reloadRoleOverrides }}>
+    <AuthCtx.Provider value={{ user, loading, login, logout, roleOverrides, reloadRoleOverrides, updateProfile }}>
       {children}
     </AuthCtx.Provider>
   );

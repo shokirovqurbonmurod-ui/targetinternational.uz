@@ -9,14 +9,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '..', '..', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-// Kitob fayllari (PDF, EPUB, Word, matn), hujjat suratlari (pasport/guvohnoma skani uchun rasm)
-// va video darslar uchun video fayllar.
-const ALLOWED_EXT = ['.pdf', '.epub', '.doc', '.docx', '.txt', '.jpg', '.jpeg', '.png', '.webp', '.mp4', '.webm', '.mov', '.avi'];
+// Kitob fayllari (PDF, EPUB, Word, matn), hujjat suratlari (pasport/guvohnoma skani uchun rasm),
+// video darslar uchun video fayllar va chatdagi ovozli/video xabarlar uchun audio fayllar.
+const ALLOWED_EXT = ['.pdf', '.epub', '.doc', '.docx', '.txt', '.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.mov', '.avi', '.ogg', '.mp3', '.wav', '.m4a'];
 const ALLOWED_MIME = [
   'application/pdf', 'application/epub+zip',
   'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'text/plain', 'image/jpeg', 'image/png', 'image/webp',
+  'text/plain', 'image/jpeg', 'image/png', 'image/webp', 'image/gif',
   'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo',
+  'audio/webm', 'audio/ogg', 'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a',
 ];
 
 const storage = multer.diskStorage({
@@ -31,7 +32,7 @@ const storage = multer.diskStorage({
 function fileFilter(_req, file, cb) {
   const ext = path.extname(file.originalname).toLowerCase();
   if (!ALLOWED_EXT.includes(ext) || !ALLOWED_MIME.includes(file.mimetype)) {
-    return cb(new Error("Ruxsat etilgan formatlar: PDF, EPUB, DOC, DOCX, TXT, JPG, PNG, WEBP, MP4, WEBM, MOV, AVI"));
+    return cb(new Error("Ruxsat etilgan formatlar: PDF, EPUB, DOC, DOCX, TXT, JPG, PNG, WEBP, GIF, MP4, WEBM, MOV, AVI, OGG, MP3, WAV, M4A"));
   }
   cb(null, true);
 }

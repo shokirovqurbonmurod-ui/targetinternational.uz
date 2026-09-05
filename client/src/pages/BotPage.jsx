@@ -308,7 +308,7 @@ export default function BotPage() {
                 <h3 className="font-display text-lg">AI Yordamchi Ustoz & Mini App</h3>
               </div>
               <p className="text-[11px] text-navy-400 mb-4">
-                Yoqilsa, bot sun'iy intellekt bilan avtomatik javob beradi — imzosiz, oddiy xabar sifatida (barcha javoblar "ISO Termizy AI Auditi" bo'limida ham ko'rinadi):
+                Yoqilsa, bot sun'iy intellekt bilan avtomatik javob beradi — imzosiz, oddiy xabar sifatida (barcha javoblar "Target International School AI Auditi" bo'limida ham ko'rinadi):
               </p>
               <ul className="text-[11px] text-navy-500 mb-4 space-y-1 pl-4 list-disc">
                 <li><b>Pastda "Savol-javob guruhi" chat_id (va ixtiyoriy Topic ID) belgilangan bo'lsa:</b> bot <u>FAQAT</u> o'sha bitta guruh/mavzuda javob beradi (mention shart emas, Junior IT Academy'dagi kabi har bir xabarga) — boshqa hech qanday guruhda, hatto mention qilinsa ham, aralashmaydi.</li>

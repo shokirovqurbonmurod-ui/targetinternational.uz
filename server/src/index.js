@@ -302,7 +302,7 @@ app.use('/api/discounts', crudRouter('discounts',
 app.use('/api/messages', crudRouter('messages',
   ['title', 'channel', 'audience', 'date', 'status']));
 app.use('/api/coin_shop', crudRouter('coin_shop',
-  ['item', 'icon', 'cost', 'tone', 'status']));
+  ['item', 'icon', 'image', 'cost', 'tone', 'status']));
 // CoinDashboard.jsx va PointGive.jsx to'g'ridan-to'g'ri '/coin_log' chaqiradi (boshqa 300+ jadval
 // kabi) — '/api/coins/log' esa alohida, faqat o'qish uchun (100 tagacha) alias sifatida qoladi.
 app.use('/api/coin_log', crudRouter('coin_log',

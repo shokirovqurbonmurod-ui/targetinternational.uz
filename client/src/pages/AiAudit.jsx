@@ -33,7 +33,7 @@ export default function AiAudit() {
 
   return (
     <div>
-      <PageHeader icon={Bot} title="ISO Termizy AI Auditi" subtitle={`Kim, qachon AI'dan foydalangani — ${rows.length} ta murojaat, ${users.size} ta foydalanuvchi`}
+      <PageHeader icon={Bot} title="Target International School AI Auditi" subtitle={`Kim, qachon AI'dan foydalangani — ${rows.length} ta murojaat, ${users.size} ta foydalanuvchi`}
         actions={rows.length > 0 && (
           <button className="btn-ghost" onClick={exportCsv}><Download size={16} /> Yuklab olish</button>
         )} />
@@ -64,7 +64,7 @@ export default function AiAudit() {
         </div>
 
         {filtered.length === 0 ? (
-          <Empty icon={Bot} title="Hozircha yozuvlar yo'q" hint="Foydalanuvchilar ISO Termizy AI bilan suhbatlashgach, bu yerda qayd etiladi." />
+          <Empty icon={Bot} title="Hozircha yozuvlar yo'q" hint="Foydalanuvchilar Target International School AI bilan suhbatlashgach, bu yerda qayd etiladi." />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

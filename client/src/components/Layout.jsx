@@ -51,9 +51,19 @@ export default function Layout() {
         <header className="h-[68px] shrink-0 bg-white/80 backdrop-blur-xl border-b border-navy-100/50 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <button className="lg:hidden text-navy-500 hover:text-navy-700 transition" onClick={() => setDrawer(true)}><Menu size={22} /></button>
-            <div className="hidden sm:block">
-              <div className="font-display text-lg text-navy-800">ISO Termizy Avlodlari</div>
-              <div className="text-[11px] text-navy-400 -mt-1">Xorijiy tillar o'quv markazi · Sherobod</div>
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="relative w-9 h-9 rounded-full border-[3px] border-navy-700 bg-navy-900 shadow-inner">
+                <div className="absolute inset-[18%] rounded-full border border-white/50" />
+                <div className="absolute inset-0 flex items-center justify-center"><div className="w-[2px] h-full bg-red-500/90" /></div>
+                <div className="absolute inset-0 flex items-center justify-center"><div className="h-[2px] w-full bg-red-500/90" /></div>
+                <div className="absolute inset-[25%] rounded-full border-[2px] border-red-500/80" />
+              </div>
+              <div className="leading-none">
+                <div className="font-black tracking-[-0.06em] text-[17px] text-navy-800">
+                  <span className="text-red-500">TAR</span><span className="text-navy-900">GET</span>
+                </div>
+                <div className="text-[9px] text-navy-400 uppercase tracking-[0.14em]">International School</div>
+              </div>
             </div>
             <div className="hidden md:flex items-center gap-1.5 rounded-full bg-gold/10 border border-gold/20 px-3 py-1.5 ml-2">
               <span className="text-[11px] font-bold text-gold-700">📅 {todayStr}</span>

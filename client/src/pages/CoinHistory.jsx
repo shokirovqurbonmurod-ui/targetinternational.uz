@@ -34,7 +34,9 @@ export default function CoinHistory() {
       if (type === 'in' && Number(r.amount) < 0) return false;
       if (type === 'out' && Number(r.amount) >= 0) return false;
       if (range !== 'all') {
-        const d = new Date((r.at || '').replace(' ', 'T'));
+        // Server vaqti UTC (Z qirqilgan) — qayta 'Z' qo'shmasak brauzer mahalliy vaqt deb o'qib,
+        // "shu oy/hafta" chegaralarini noto'g'ri hisoblashi mumkin edi.
+        const d = new Date((r.at || '').replace(' ', 'T') + 'Z');
         if (isNaN(d)) return true;
         if (range === 'month' && (d.getMonth() !== now.getMonth() || d.getFullYear() !== now.getFullYear())) return false;
         if (range === 'week') {

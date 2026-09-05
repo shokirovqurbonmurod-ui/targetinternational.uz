@@ -36,7 +36,15 @@ r.get('/stats', (_req, res) => {
 r.get('/staff', (_req, res) => {
   const rows = store.where('users', (u) => !['student', 'parent'].includes(u.role))
     .slice().sort((a, b) => a.id - b.id)
-    .map((u) => ({ id: u.id, full_name: u.full_name, phone: u.phone, role: u.role, group_name: u.group_name, branch: u.branch, active: u.active, role_label: ROLE_LABEL[u.role] || u.role }));
+    .map((u) => ({ id: u.id, full_name: u.full_name, phone: u.phone, role: u.role, group_name: u.group_name, branch: u.branch, active: u.active, role_label: ROLE_LABEL[u.role] || u.role, avatar_url: u.avatar_url || '', bio: u.bio || '' }));
+  res.json(rows);
+});
+
+// GET /api/people — barcha rollar (talaba/ota-ona ham), faqat avatar/bio qidirish uchun
+// (masalan chatda xabar yuborgan talabaning profil rasmi/bio'sini ko'rsatish uchun).
+r.get('/people', (_req, res) => {
+  const rows = store.all('users')
+    .map((u) => ({ id: u.id, full_name: u.full_name, role: u.role, avatar_url: u.avatar_url || '', bio: u.bio || '' }));
   res.json(rows);
 });
 

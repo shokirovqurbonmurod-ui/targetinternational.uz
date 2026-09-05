@@ -160,7 +160,7 @@ export default function AiAssistant() {
   }
 
   function exportChat() {
-    const lines = messages.map((m) => `${m.role === 'user' ? user.full_name : 'ISO Termizy AI'}: ${m.text}`);
+    const lines = messages.map((m) => `${m.role === 'user' ? user.full_name : 'Target International School AI'}: ${m.text}`);
     const blob = new Blob([lines.join('\n\n')], { type: 'text/plain;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -213,7 +213,7 @@ export default function AiAssistant() {
 
   return (
     <div>
-      <PageHeader icon={Bot} title="ISO Termizy AI 🤖✨" subtitle="Sun'iy intellekt yordamchisi — savolingizga javob beradi" />
+      <PageHeader icon={Bot} title="Target International School AI 🤖✨" subtitle="Sun'iy intellekt yordamchisi — savolingizga javob beradi" />
 
       <div className="grid lg:grid-cols-4 gap-6" style={{ height: 'calc(100vh - 200px)' }}>
         {/* Chat */}

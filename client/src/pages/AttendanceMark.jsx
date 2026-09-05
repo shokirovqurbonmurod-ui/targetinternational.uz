@@ -60,7 +60,7 @@ export default function AttendanceMark() {
   }
 
   function exportTXT() {
-    const lines = ['ISO TERMIZY — DAVOMAT', 'Sana: ' + dateStr + ' ' + dayName, 'Guruh: ' + group, 'Smena: ' + SHIFTS.find(x=>x.key===shift)?.label, ''];
+    const lines = ['TARGET INTERNATIONAL SCHOOL — DAVOMAT', 'Sana: ' + dateStr + ' ' + dayName, 'Guruh: ' + group, 'Smena: ' + SHIFTS.find(x=>x.key===shift)?.label, ''];
     list.forEach(s => {
       const mark = marks[s.id] || 'belgilanmagan';
       lines.push(s.full_name + ' — ' + mark);

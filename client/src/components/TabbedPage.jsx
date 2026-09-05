@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { canAccess } from '../config/menu.js';
 import { emojiForItem } from '../config/menuEmojis.js';
@@ -6,10 +7,15 @@ import { renderKind } from '../App.jsx';
 
 // Bitta sidebar elementi ichida bir nechta eski sahifani tab sifatida ko'rsatadi.
 // item.tabs: [{ key, label, icon, kind, resource?, roles? }]
+// ?tab=<key> orqali boshqa joydan (masalan kiruvchi qo'ng'iroq bannerining "Ochish" tugmasi)
+// to'g'ridan-to'g'ri kerakli ichki tabga o'tkazish mumkin — aks holda doim birinchi tab ochilardi.
 export default function TabbedPage({ item }) {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const visibleTabs = useMemo(() => item.tabs.filter((t) => canAccess(user.role, t)), [item.tabs, user.role]);
-  const [active, setActive] = useState(visibleTabs[0]?.key);
+  const requestedTab = searchParams.get('tab');
+  const [active, setActive] = useState(() =>
+    (requestedTab && visibleTabs.some((t) => t.key === requestedTab)) ? requestedTab : visibleTabs[0]?.key);
   const current = visibleTabs.find((t) => t.key === active) || visibleTabs[0];
 
   if (visibleTabs.length === 0) {

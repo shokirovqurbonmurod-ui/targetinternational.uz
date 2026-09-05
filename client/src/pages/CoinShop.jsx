@@ -15,6 +15,7 @@ import { ShoppingBag, Coins, Eraser, PenTool, Pencil, StickyNote, NotebookPen, H
 import { api } from '../lib/api.js';
 import { PageHeader, Spinner, Modal } from '../components/ui.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
+import { ImagePlus, X } from 'lucide-react';
 
 const ICONS = {
   Eraser, PenTool, Pencil, StickyNote, NotebookPen, Highlighter, Paintbrush, CupSoda,
@@ -48,6 +49,7 @@ export default function CoinShop() {
   const [err, setErr] = useState('');
   const [modal, setModal] = useState(null); // 'add' | 'edit'
   const [form, setForm] = useState({});
+  const [uploading, setUploading] = useState(false);
 
   const canManage = !['student', 'parent', 'guest'].includes(user.role);
 
@@ -78,12 +80,27 @@ export default function CoinShop() {
   }
 
   function openAdd() {
-    setForm({ item: '', icon: 'Gift', cost: 5000, tone: 'slate', status: 'active' });
+    setForm({ item: '', icon: 'Gift', image: '', cost: 5000, tone: 'slate', status: 'active' });
     setErr(''); setModal('add');
   }
   function openEdit(p) {
-    setForm({ id: p.id, item: p.item, icon: p.icon || 'Gift', cost: p.cost, tone: p.tone || 'slate', status: p.status || 'active' });
+    setForm({ id: p.id, item: p.item, icon: p.icon || 'Gift', image: p.image || '', cost: p.cost, tone: p.tone || 'slate', status: p.status || 'active' });
     setErr(''); setModal('edit');
+  }
+  async function uploadImage(file) {
+    if (!file) return;
+    setErr(''); setUploading(true);
+    try {
+      const oldImage = form.image;
+      const res = await api.upload(file);
+      setForm((f) => ({ ...f, image: res.url }));
+      if (oldImage && oldImage.startsWith('/uploads/')) api.del(oldImage).catch(() => {});
+    } catch (e) { setErr(e.message); }
+    setUploading(false);
+  }
+  function removeImage() {
+    if (form.image && form.image.startsWith('/uploads/')) api.del(form.image).catch(() => {});
+    setForm((f) => ({ ...f, image: '' }));
   }
   async function save() {
     setErr('');
@@ -143,8 +160,12 @@ export default function CoinShop() {
                     <button onClick={() => remove(it)} className="grid place-items-center w-6 h-6 rounded-lg hover:bg-red-50 text-navy-300 hover:text-red-500 transition" title="O'chirish"><Trash2 size={12} /></button>
                   </div>
                 )}
-                <div className={`grid place-items-center w-14 h-14 rounded-2xl bg-gradient-to-br ${tone} mb-2`}>
-                  <Ico size={26} strokeWidth={1.5} />
+                <div className={`grid place-items-center w-14 h-14 rounded-2xl bg-gradient-to-br ${tone} mb-2 overflow-hidden`}>
+                  {it.image ? (
+                    <img src={api.fileUrl(it.image)} alt={it.item} className="w-full h-full object-cover" />
+                  ) : (
+                    <Ico size={26} strokeWidth={1.5} />
+                  )}
                 </div>
                 <div className="font-bold text-navy-800 text-xs mb-1 min-h-[2rem] flex items-center">{it.item}</div>
                 <div className="chip bg-gradient-to-r from-gold-100 to-gold-50 text-gold-700 shadow-sm mb-2 text-xs">
@@ -188,6 +209,26 @@ export default function CoinShop() {
             </div>
           </div>
           <div>
+            <label className="label">Rasm</label>
+            {form.image ? (
+              <div className="relative w-20 h-20">
+                <img src={api.fileUrl(form.image)} alt="" className="w-20 h-20 rounded-2xl object-cover border border-navy-100" />
+                <button type="button" onClick={removeImage}
+                  className="absolute -top-2 -right-2 grid place-items-center w-6 h-6 rounded-full bg-red-500 text-white shadow hover:bg-red-600 transition">
+                  <X size={12} />
+                </button>
+              </div>
+            ) : (
+              <label className={`flex items-center gap-2 justify-center w-full py-3 rounded-xl border-2 border-dashed border-navy-200 text-navy-400 hover:border-gold hover:text-gold cursor-pointer transition text-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <ImagePlus size={16} />
+                {uploading ? 'Yuklanmoqda...' : 'Rasm yuklash'}
+                <input type="file" accept="image/*" className="hidden"
+                  onChange={(e) => { uploadImage(e.target.files?.[0]); e.target.value = ''; }} />
+              </label>
+            )}
+            <p className="text-xs text-navy-300 mt-1">Rasm bo'lmasa, quyidagi ikonka ko'rsatiladi.</p>
+          </div>
+          <div className={form.image ? 'opacity-40 pointer-events-none' : ''}>
             <label className="label">Ikonka</label>
             <div className="grid grid-cols-8 gap-2 max-h-40 overflow-y-auto p-2 rounded-xl bg-navy-50">
               {ICON_KEYS.map((key) => {

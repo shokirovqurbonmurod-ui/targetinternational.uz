@@ -20,11 +20,17 @@ export default function IncomingCallBanner() {
       const rows = await api.get(`/call_signals?to=${encodeURIComponent(user.full_name)}&after=${lastIdRef.current}`).catch(() => []);
       for (const s of rows) {
         lastIdRef.current = Math.max(lastIdRef.current, s.id);
+        // Server vaqti UTC (toISOString()'dan olingan, 'Z' qirqib tashlangan) — shuning uchun
+        // qayta 'Z' qo'shib UTC sifatida o'qiladi, aks holda brauzer uni mahalliy vaqt deb
+        // talqin qilib, soat noto'g'ri farq chiqarib, qo'ng'iroqni doim "eski" deb hisoblardi.
+        const age = Date.now() - new Date((s.at || '').replace(' ', 'T') + 'Z').getTime();
         if (s.type === 'offer') {
-          const age = Date.now() - new Date((s.at || '').replace(' ', 'T')).getTime();
           if (age < RING_TIMEOUT_MS) setOffer(s);
         } else if (['hangup', 'busy', 'decline'].includes(s.type)) {
-          setOffer((cur) => (cur && cur.from === s.from ? null : cur));
+          // Sahifa yangi ochilganda (after=0) butun eski tarix bitta partiyada kelishi mumkin —
+          // eski, allaqachon tugagan qo'ng'iroqning hangup/decline signali hozirgina o'rnatilgan
+          // YANGI taklifni bekor qilib qo'ymasligi uchun, faqat yaqinda kelgan signal hisobga olinadi.
+          if (age < RING_TIMEOUT_MS) setOffer((cur) => (cur && cur.from === s.from ? null : cur));
         }
       }
     }, 3000);
@@ -44,7 +50,7 @@ export default function IncomingCallBanner() {
     setOffer(null);
   }
   function accept() {
-    navigate(`/app/group-chat?dm=${encodeURIComponent(offer.from)}`);
+    navigate(`/app/chat-messages?tab=group-chat&dm=${encodeURIComponent(offer.from)}`);
     setOffer(null);
   }
 

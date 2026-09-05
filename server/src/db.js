@@ -233,7 +233,7 @@ export const TABLES = ['users', 'students', 'teachers', 'groups', 'courses', 'pa
   'payment_reminders_log', 'study_group_members', 'fitness_logs', 'subscription_members', 'virtual_room_members', 'feature_request_votes', 'chat_rooms', 'ticket_replies',
   'chat_custom_emojis', 'chat_premium', 'announcement_reads', 'chat_bots', 'call_signals',
   'group_call_participants', 'chat_read_state', 'chat_pins', 'chat_mutes', 'chat_saved', 'promo_code_redemptions',
-  'chat_typing', 'user_presence', 'chat_reports', 'bot_pending_actions'];
+  'chat_typing', 'user_presence', 'chat_reports', 'bot_pending_actions', 'bot_ai_sessions'];
 
 function blank() { const d = {}; for (const t of TABLES) d[t] = []; return d; }
 

@@ -39,7 +39,7 @@ r.post('/login', (req, res) => {
 
   resetRateLimit(phone);
   logAudit(user.full_name, 'login', user.role);
-  const safe = { id: user.id, phone: user.phone, role: user.role, full_name: user.full_name, group_name: user.group_name, branch: user.branch };
+  const safe = { id: user.id, phone: user.phone, role: user.role, full_name: user.full_name, group_name: user.group_name, branch: user.branch, avatar_url: user.avatar_url || '', bio: user.bio || '' };
   res.json({ token: signToken(user), user: safe });
 });
 
@@ -47,7 +47,20 @@ r.post('/login', (req, res) => {
 r.get('/me', authRequired, (req, res) => {
   const u = store.get('users', req.user.id);
   if (!u) return res.status(404).json({ error: 'Foydalanuvchi topilmadi' });
-  res.json({ id: u.id, phone: u.phone, role: u.role, full_name: u.full_name, group_name: u.group_name, branch: u.branch });
+  res.json({ id: u.id, phone: u.phone, role: u.role, full_name: u.full_name, group_name: u.group_name, branch: u.branch, avatar_url: u.avatar_url || '', bio: u.bio || '' });
+});
+
+// PUT /api/auth/profile — har bir foydalanuvchi FAQAT o'zining profil rasmi/bio'sini tahrirlaydi
+// (req.user.id JWT'dan olinadi, boshqa birovning profiliga yozib bo'lmaydi).
+r.put('/profile', authRequired, (req, res) => {
+  const { avatar_url, bio } = req.body || {};
+  const patch = {};
+  if (avatar_url !== undefined) patch.avatar_url = String(avatar_url).slice(0, 300);
+  if (bio !== undefined) patch.bio = String(bio).slice(0, 300);
+  const updated = store.update('users', req.user.id, patch);
+  if (!updated) return res.status(404).json({ error: 'Foydalanuvchi topilmadi' });
+  logAudit(req.user.name, 'update profile', '');
+  res.json({ id: updated.id, avatar_url: updated.avatar_url || '', bio: updated.bio || '' });
 });
 
 export default r;

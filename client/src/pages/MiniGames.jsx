@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Gamepad2, Trophy, Clock, Star, RotateCcw } from 'lucide-react';
 import { PageHeader } from '../components/ui.jsx';
-import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../lib/api.js';
 
 const WORDS = [
@@ -607,7 +606,6 @@ const GAME_MAP = {
 };
 
 export default function MiniGames() {
-  const { user } = useAuth();
   const [active, setActive] = useState(null);
   const [result, setResult] = useState(null);
   const [totalCoins, setTotalCoins] = useState(0);
@@ -627,18 +625,17 @@ export default function MiniGames() {
     }).catch(() => {});
   }, []);
 
-  const MIN_COINS_PER_PLAY = 5;
-  const MAX_COINS_PER_PLAY = 10;
   async function handleWin(score) {
     const game = GAMES.find(g => g.id === active);
-    const coins = Math.max(MIN_COINS_PER_PLAY, Math.min(game.reward * score, MAX_COINS_PER_PLAY));
-    setResult({ won: true, coins, score });
-    setTotalCoins(t => t + coins);
+    // Coin miqdori serverda hisoblanadi (max 3) — mijoz faqat g'alaba haqida xabar beradi.
     try {
-      const students = await api.get('/students').catch(() => []);
-      const me = (students || []).find(s => s.full_name === user.full_name);
-      if (me) await api.post('/coins/give', { student_id: me.id, amount: coins, reason: game.name + ' — ' + score + ' ball' }).catch(() => {});
-    } catch {}
+      const res = await api.post('/mini-games/complete', { game_name: game.name }).catch(() => null);
+      const coins = res?.coins || 0;
+      setResult({ won: true, coins, score });
+      setTotalCoins(t => t + coins);
+    } catch {
+      setResult({ won: true, coins: 0, score });
+    }
   }
 
   function handleLose() { setResult({ won: false, coins: 0, score: 0 }); }
@@ -657,7 +654,7 @@ export default function MiniGames() {
               <div className={`grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br ${g.color} text-3xl mb-4 shadow-lg`}>{g.icon}</div>
               <div className="font-display text-lg text-navy-800 mb-1">{g.name}</div>
               <div className="text-sm text-navy-400 mb-3">{g.desc}</div>
-              <div className="chip bg-gold/10 text-gold-700">🪙 +{g.reward} coin/to'g'ri</div>
+              <div className="chip bg-gold/10 text-gold-700">🪙 1-3 coin</div>
             </button>
           ))}
         </div>

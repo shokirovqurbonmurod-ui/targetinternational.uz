@@ -36,7 +36,7 @@ export default function Reports({ menuKey }) {
     const now = new Date();
     const header = [
       '████████████████████████████████████████████████████████',
-      '     ISO TERMIZY AVLODLARI — HISOBOT',
+      '     TARGET INTERNATIONAL SCHOOL — HISOBOT',
       '████████████████████████████████████████████████████████',
       `Sana: ${now.toLocaleDateString('uz-UZ')}`,
       `Hisobot turi: ${REPORT_TYPES.find(r=>r.key===type)?.label}`,
@@ -91,7 +91,7 @@ export default function Reports({ menuKey }) {
     const footer = [
       '────────────────────────────────────────────────────────',
       `Tuzilgan: ${now.toLocaleString('uz-UZ')}`,
-      `Tuzuvchi: ISO Termizy Avlodlari · Tizim`,
+      `Tuzuvchi: Target International School · Tizim`,
       '████████████████████████████████████████████████████████',
     ];
 

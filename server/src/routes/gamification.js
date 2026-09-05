@@ -438,4 +438,17 @@ r.post('/chat-premium/buy', (req, res) => {
   res.status(201).json({ row, balance });
 });
 
+// Mini o'yinlar (Mini Games) — mukofot boshqa "sovrin talab qilish" funksiyalari kabi (Omad
+// g'ildiragi, Mystery Box) serverda hisoblanadi: mijoz g'alaba haqida xabar beradi, lekin coin
+// miqdorini o'zi belgilay olmaydi — aks holda so'rovni o'zgartirib istagancha coin yozib olishi mumkin edi.
+r.post('/mini-games/complete', (req, res) => {
+  const student = myStudent(req);
+  if (!student) return res.status(403).json({ error: "Bu buyruq faqat o'quvchi hisobi uchun ishlaydi." });
+  const { game_name } = req.body || {};
+  const coins = randomSmallReward();
+  const balance = creditCoins(student, coins, `Mini o'yin: ${game_name || 'noma\'lum'}`);
+  logAudit(student.full_name, 'mini game complete', game_name || '');
+  res.json({ coins, balance });
+});
+
 export default r;

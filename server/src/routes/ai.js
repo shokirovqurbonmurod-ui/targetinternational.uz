@@ -200,13 +200,16 @@ r.post('/chat', async (req, res) => {
   if (!apiKey) {
     return res.status(503).json({ error: "AI hali ulanmagan — administrator OPENROUTER_API_KEY sozlashi kerak." });
   }
-  const { message, history, session } = req.body || {};
+  const { message, history, session, persona } = req.body || {};
   if (!message || !String(message).trim()) {
     return res.status(400).json({ error: "Savol matni bo'sh bo'lmasin" });
   }
 
   const context = buildDataContext(req.user);
-  const systemText = `${SYSTEM_INSTRUCTION}\n\n--- JORIY TIZIM MA'LUMOTLARI ---\nSiz bilan gaplashayotgan foydalanuvchi: ${req.user.name} (${ROLE_LABEL[req.user.role] || req.user.role}).\n${context}\n--- MA'LUMOTLAR TUGADI ---`;
+  // Chatdagi qo'shimcha botlar (admin yaratgan) o'z "persona"siga ega bo'lishi mumkin —
+  // asosiy ISO Termizy AI shaxsiyati o'rniga shu matn ishlatiladi, lekin ma'lumotlar konteksti saqlanadi.
+  const base = persona ? String(persona).slice(0, 2000) : SYSTEM_INSTRUCTION;
+  const systemText = `${base}\n\n--- JORIY TIZIM MA'LUMOTLARI ---\nSiz bilan gaplashayotgan foydalanuvchi: ${req.user.name} (${ROLE_LABEL[req.user.role] || req.user.role}).\n${context}\n--- MA'LUMOTLAR TUGADI ---`;
 
   const messages = [{ role: 'system', content: systemText }];
   for (const turn of Array.isArray(history) ? history.slice(-10) : []) {
