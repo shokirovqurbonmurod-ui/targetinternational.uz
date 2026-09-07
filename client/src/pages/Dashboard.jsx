@@ -1,19 +1,33 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, GraduationCap, Boxes, Wallet, CreditCard, UserSearch, TrendingUp, LayoutDashboard, Sparkles, ArrowRight } from 'lucide-react';
+import { Users, GraduationCap, Boxes, Wallet, CreditCard, UserSearch, Sparkles, ArrowRight, ArrowUpRight, Trophy, Megaphone, CreditCard as CreditCardIcon } from 'lucide-react';
 import { api } from '../lib/api.js';
-import { PageHeader, Spinner } from '../components/ui.jsx';
+import { Spinner } from '../components/ui.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { compactMoney, money, statusStyle } from '../lib/format.js';
 
 const TONES = [
-  ['from-gold-400/20 to-gold-100/10', 'text-gold-600', 'bg-gold-400/15'],
-  ['from-blue-400/20 to-blue-100/10', 'text-blue-600', 'bg-blue-400/15'],
-  ['from-emerald-400/20 to-emerald-100/10', 'text-emerald-600', 'bg-emerald-400/15'],
-  ['from-violet-400/20 to-violet-100/10', 'text-violet-600', 'bg-violet-400/15'],
-  ['from-rose-400/20 to-rose-100/10', 'text-rose-600', 'bg-rose-400/15'],
-  ['from-cyan-400/20 to-cyan-100/10', 'text-cyan-600', 'bg-cyan-400/15'],
+  ['from-gold-400/25 to-gold-100/10', 'text-gold-600', 'ring-gold/20'],
+  ['from-blue-400/25 to-blue-100/10', 'text-blue-600', 'ring-blue-200/60'],
+  ['from-emerald-400/25 to-emerald-100/10', 'text-emerald-600', 'ring-emerald-200/60'],
+  ['from-violet-400/25 to-violet-100/10', 'text-violet-600', 'ring-violet-200/60'],
+  ['from-rose-400/25 to-rose-100/10', 'text-rose-600', 'ring-rose-200/60'],
+  ['from-cyan-400/25 to-cyan-100/10', 'text-cyan-600', 'ring-cyan-200/60'],
 ];
+
+function SectionTitle({ icon: Icon, title, extra, tone = 'gold' }) {
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-3">
+        <span className={`icon-tile w-9 h-9 bg-gradient-to-br ring-1 ${tone === 'gold' ? 'from-gold-400/25 to-gold-100/10 text-gold-600 ring-gold/20' : 'from-blue-400/25 to-blue-100/10 text-blue-600 ring-blue-200/60'}`}>
+          <Icon size={16} />
+        </span>
+        <h3 className="font-display text-lg text-navy-800">{title}</h3>
+      </div>
+      {extra}
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -51,134 +65,148 @@ export default function Dashboard() {
   const greeting = hour < 12 ? 'Xayrli tong' : hour < 18 ? 'Xayrli kun' : 'Xayrli kech';
 
   return (
-    <div>
+    <div className="max-w-[1400px] mx-auto">
       {/* Hero greeting */}
-      <div className="card p-6 mb-6 bg-gradient-to-r from-navy-700 via-navy-800 to-navy-900 border-0 relative overflow-hidden">
-        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-gold/10 blur-3xl" />
-        <div className="absolute -left-8 bottom-0 w-40 h-40 rounded-full bg-gold/5 blur-2xl" />
+      <div className="hero-premium card p-6 lg:p-8 mb-6 bg-gradient-to-br from-navy-700 via-navy-800 to-navy-900 border-0 rounded-[30px] shadow-[0_24px_60px_-24px_rgba(13,21,34,.5)]">
+        <div className="absolute -right-14 -top-16 w-72 h-72 rounded-full border border-white/10 animate-float" />
+        <div className="absolute -right-4 -top-6 w-44 h-44 rounded-full border border-gold/20 animate-float" style={{ animationDelay: '-2.5s' }} />
+
         <div className="relative flex items-start justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4">
-            <div className="grid place-items-center w-14 h-14 rounded-2xl bg-gold/20 text-3xl">
-              <Sparkles size={28} className="text-gold-300" />
+            <div className="icon-tile w-14 h-14 bg-gradient-to-br from-gold-300 to-gold-600 text-white ring-4 ring-white/10 shadow-lg shadow-gold/30">
+              <Sparkles size={26} />
             </div>
             <div>
-              <h1 className="font-display text-2xl text-white">{greeting}, {firstName}!</h1>
-              <p className="text-navy-200 text-sm mt-0.5 max-w-lg">Target Inernational School platformangizga xush kelibsiz. Yangi AI yordamchi, CRM va LMS funksiyalari bilan ishlashingizni soddalashtiraylik.</p>
+              <div className="text-[10px] font-extrabold uppercase tracking-[.18em] text-gold-300/90 mb-1">Command Center</div>
+              <h1 className="font-display text-2xl lg:text-[28px] text-white leading-tight">{greeting}, {firstName}! 👋</h1>
+              <p className="text-navy-200/90 text-sm mt-1 max-w-xl">Target International School platformangizga xush kelibsiz. Barcha jarayonlaringiz bir joyda — sodda va tezkor.</p>
             </div>
           </div>
-          <button onClick={() => navigate('/app/ai-assistant')} className="btn bg-white/95 text-navy-800 hover:bg-white shrink-0">
-            <Sparkles size={16} className="text-gold-500" /> AI yordamchiga o'tish
+          <button onClick={() => navigate('/app/ai-assistant')} className="btn-gold !rounded-2xl shrink-0">
+            <Sparkles size={16} /> AI yordamchi
+            <ArrowUpRight size={15} />
           </button>
         </div>
-        <div className="relative grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-5">
+
+        <div className="relative grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-6">
           {[
-            ['HOZIRGI BO\'LIM', 'Command Center'],
-            ['SO\'NGGI YANGILIK', 'AI yordamchi va CRM'],
-            ['DAVOM ETISH', 'Monitoring va analytics'],
-            ['YORDAM', 'Tezkor chat'],
-          ].map(([k, v]) => (
-            <div key={k} className="rounded-2xl bg-white/[.07] border border-white/10 px-3.5 py-2.5">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-navy-300/70">{k}</div>
-              <div className="text-sm font-semibold text-white mt-0.5 truncate">{v}</div>
+            ['HOZIRGI BO\'LIM', 'Command Center', 'from-gold-400/20 to-gold-600/5'],
+            ['SO\'NGI YANGILIK', 'AI yordamchi va CRM', 'from-blue-400/20 to-blue-600/5'],
+            ['DAVOM ETISH', 'Monitoring va analytics', 'from-emerald-400/20 to-emerald-600/5'],
+            ['YORDAM', 'Tezkor chat', 'from-violet-400/20 to-violet-600/5'],
+          ].map(([k, v, grad]) => (
+            <div key={k} className={`rounded-2xl bg-gradient-to-br ${grad} border border-white/10 px-3.5 py-3 backdrop-blur hover:bg-white/10 transition group cursor-default`}>
+              <div className="text-[9px] font-extrabold uppercase tracking-[.14em] text-navy-200/70">{k}</div>
+              <div className="text-sm font-bold text-white mt-1 truncate flex items-center gap-1.5">
+                {v} <ArrowRight size={12} className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {cards.map((c, i) => {
-          const [gradient, textColor, iconBg] = TONES[i % TONES.length];
+          const [gradient, textColor, ring] = TONES[i % TONES.length];
           return (
-            <div key={c.label} className="card stat-glow p-5" style={{ animationDelay: `${i * 60}ms` }}>
+            <div key={c.label} className="card stat-glow card-hover group p-5" style={{ animationDelay: `${i * 60}ms` }}>
               <div className="flex items-center justify-between mb-3">
-                <div className={`grid place-items-center w-11 h-11 rounded-xl bg-gradient-to-br ${gradient}`}>
-                  <c.icon size={20} className={textColor} />
+                <div className={`icon-tile w-11 h-11 bg-gradient-to-br ring-1 ${gradient} ${ring} group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-200 ease-ios`}>
+                  <c.icon size={20} strokeWidth={2.1} className={textColor} />
                 </div>
-                {c.hint && <span className="text-xs font-bold text-emerald-600 bg-emerald-50 rounded-full px-2 py-0.5">{c.hint}</span>}
+                {c.hint && <span className="chip !text-[11px] bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm">{c.hint}</span>}
               </div>
-              <div className="font-display text-2xl text-navy-800">{c.value}</div>
-              <div className="text-sm text-navy-400 mt-0.5">{c.label}</div>
+              <div className="font-display text-2xl text-navy-800 tnum leading-none">{c.value}</div>
+              <div className="text-[13px] text-navy-400 font-medium mt-1.5">{c.label}</div>
             </div>
           );
         })}
-        <button onClick={() => navigate('/app/ai-assistant')}
-          className="text-left rounded-[28px] shadow-ios p-5 bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 text-white relative overflow-hidden group transition-transform duration-200 ease-ios hover:-translate-y-0.5">
-          <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative flex items-center justify-between mb-3">
-            <div className="grid place-items-center w-11 h-11 rounded-xl bg-white/15"><Sparkles size={20} /></div>
-            <ArrowRight size={16} className="opacity-70 group-hover:translate-x-0.5 transition-transform" />
-          </div>
-          <div className="relative text-[10px] font-bold uppercase tracking-wider text-white/70">AI Yordamchi</div>
-          <div className="relative font-display text-lg leading-tight mt-0.5">Target International School AI</div>
-        </button>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Leaderboard */}
-        <div className="lg:col-span-2 card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display text-lg text-navy-800">🏆 TOP o'quvchilar</h3>
-            <span className="chip bg-gold/10 text-gold-700">Ball bo'yicha</span>
-          </div>
-          <div className="space-y-1">
+        <div className="lg:col-span-2 card p-5 lg:p-6">
+          <SectionTitle icon={Trophy} title="TOP o'quvchilar"
+            extra={<span className="chip bg-gold/10 text-gold-700 border border-gold/20">⚡ Ball bo'yicha</span>} />
+          <div className="space-y-1.5">
             {board.slice(0, 7).map((s, i) => (
-              <div key={s.id} className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-navy-50 transition animate-slide" style={{ animationDelay: `${i * 50}ms` }}>
-                <div className={`grid place-items-center w-8 h-8 rounded-lg text-sm font-bold ${i < 3 ? 'bg-gradient-to-br from-gold-300 to-gold-500 text-white shadow-sm' : 'bg-navy-100 text-navy-500'}`}>{i + 1}</div>
-                <div className="grid place-items-center w-9 h-9 rounded-full bg-gradient-to-br from-navy-600 to-navy-800 text-white text-sm font-bold shadow-sm">{s.full_name[0]}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-navy-800 truncate">{s.full_name}</div>
-                  <div className="text-xs text-navy-400">{s.group_name}</div>
+              <div key={s.id} className="flex items-center gap-3.5 rounded-2xl px-3.5 py-3 hover:bg-navy-50/70 border border-transparent hover:border-navy-100 transition-all animate-slide group" style={{ animationDelay: `${i * 50}ms` }}>
+                <div className={`grid place-items-center w-9 h-9 rounded-xl text-sm font-extrabold shrink-0 transition-transform group-hover:scale-110 ${
+                  i === 0 ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-white shadow-md shadow-amber-200'
+                  : i === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-white shadow-sm'
+                  : i === 2 ? 'bg-gradient-to-br from-orange-300 to-orange-400 text-white shadow-sm'
+                  : 'bg-navy-100 text-navy-500'}`}>{i + 1}</div>
+                <div className="grid place-items-center w-10 h-10 rounded-full bg-gradient-to-br from-navy-500 to-navy-800 text-white text-sm font-bold shadow-sm ring-2 ring-white shrink-0">
+                  {s.full_name[0]}
                 </div>
-                <span className="chip bg-gold/10 text-gold-700">{s.level}</span>
-                <div className="text-sm font-bold text-navy-700 w-16 text-right tabular-nums">⚡ {s.points}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold text-navy-800 truncate">{s.full_name}</div>
+                  <div className="text-xs text-navy-400 font-medium mt-0.5 truncate">{s.group_name}</div>
+                </div>
+                <span className="chip bg-gold/10 text-gold-700 border border-gold/20 hidden sm:inline-flex">{s.level}</span>
+                <div className="text-sm font-extrabold text-navy-700 w-16 text-right tnum">⚡ {s.points}</div>
               </div>
             ))}
+            {board.length === 0 && <div className="text-sm text-navy-400 text-center py-8">Ma'lumot yo'q</div>}
           </div>
         </div>
 
         {/* Announcements */}
-        <div className="card p-5">
-          <h3 className="font-display text-lg text-navy-800 mb-4">📢 E'lonlar</h3>
+        <div className="card p-5 lg:p-6">
+          <SectionTitle icon={Megaphone} title="E'lonlar"
+            extra={<span className="text-[11px] font-bold text-navy-300">{ann.length} ta</span>} />
           <div className="space-y-3">
             {ann.slice(0, 4).map((a, i) => (
-              <div key={a.id} className={`rounded-xl px-4 py-3 border animate-fade ${a.type === 'warn' ? 'border-amber-200 bg-gradient-to-r from-amber-50 to-amber-50/50' : 'border-navy-100 bg-gradient-to-r from-navy-50/50 to-white'}`} style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="text-sm font-semibold text-navy-800">{a.title}</div>
-                <div className="text-xs text-navy-500 mt-0.5 line-clamp-2">{a.body}</div>
-                <div className="text-[11px] text-navy-400 mt-1.5">{a.author} · {a.date}</div>
+              <div key={a.id} className={`relative rounded-2xl px-4 py-3.5 border overflow-hidden animate-fade ${
+                a.type === 'warn'
+                  ? 'border-amber-200/70 bg-gradient-to-r from-amber-50 to-amber-50/30'
+                  : 'border-navy-100/70 bg-gradient-to-r from-navy-50/60 to-white'}`}
+                style={{ animationDelay: `${i * 80}ms` }}>
+                <span className={`absolute left-0 top-0 bottom-0 w-1 ${a.type === 'warn' ? 'bg-gradient-to-b from-amber-400 to-amber-500' : 'bg-gradient-to-b from-gold-400 to-gold-600'}`} />
+                <div className="text-sm font-bold text-navy-800 line-clamp-1">{a.title}</div>
+                <div className="text-xs text-navy-500 mt-1 line-clamp-2 leading-relaxed">{a.body}</div>
+                <div className="text-[10px] font-semibold text-navy-300 mt-2 tnum">{a.author} · {a.date}</div>
               </div>
             ))}
+            {ann.length === 0 && <div className="text-sm text-navy-400 text-center py-8">E'lonlar yo'q</div>}
           </div>
         </div>
       </div>
 
       {/* Recent payments */}
-      <div className="card p-5 mt-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-lg text-navy-800">💳 So'nggi to'lovlar</h3>
-          <span className="text-xs text-navy-400">{pay.length} ta yozuv</span>
-        </div>
-        <div className="overflow-x-auto rounded-xl">
+      <div className="card p-5 lg:p-6 mt-6">
+        <SectionTitle icon={CreditCardIcon} title="So'nggi to'lovlar"
+          extra={<button onClick={() => navigate('/app/buxgalteriya')} className="inline-flex items-center gap-1 text-xs font-bold text-gold-600 hover:text-gold-700 hover:gap-2 transition-all">Barchasi <ArrowRight size={13} /></button>} />
+        <div className="table-wrap">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left bg-navy-50/50 border-b border-navy-100">
-                <th className="px-4 py-3 font-semibold text-navy-400">O'quvchi</th>
-                <th className="font-semibold text-navy-400">Guruh</th>
-                <th className="font-semibold text-navy-400">Summa</th>
-                <th className="font-semibold text-navy-400">Usul</th>
-                <th className="font-semibold text-navy-400">Holat</th>
+              <tr>
+                <th className="px-4 py-3.5 text-left first:pl-4">O'quvchi</th>
+                <th className="px-4 py-3.5 text-left">Guruh</th>
+                <th className="px-4 py-3.5 text-left">Summa</th>
+                <th className="px-4 py-3.5 text-left">Usul</th>
+                <th className="px-4 py-3.5 text-left">Holat</th>
               </tr>
             </thead>
             <tbody>
-              {pay.slice(0, 8).map((p) => (
-                <tr key={p.id} className="border-b border-navy-50">
-                  <td className="px-4 py-3 font-medium text-navy-700">{p.student}</td>
-                  <td className="text-navy-500">{p.group_name}</td>
-                  <td className="font-bold text-navy-800">{money(p.amount)}</td>
-                  <td><span className="chip bg-navy-50 text-navy-600">{p.method || '—'}</span></td>
-                  <td><span className={`chip ${statusStyle(p.status)}`}>{p.status === 'paid' ? "✓ To'langan" : '⏳ Kutilmoqda'}</span></td>
+              {pay.slice(0, 8).map((p, i) => (
+                <tr key={p.id} className="group">
+                  <td className="px-4 py-3.5 font-semibold text-navy-700">
+                    <div className="flex items-center gap-2.5">
+                      <span className="grid place-items-center w-7 h-7 rounded-lg bg-gradient-to-br from-navy-100 to-navy-50 text-navy-500 text-[11px] font-bold shrink-0 group-hover:from-gold-100 group-hover:to-gold-50 transition-all">
+                        {p.student?.[0]}
+                      </span>
+                      {p.student}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5 text-navy-500">{p.group_name}</td>
+                  <td className="px-4 py-3.5 font-extrabold text-navy-800 tnum">{money(p.amount)}</td>
+                  <td className="px-4 py-3.5"><span className="chip bg-navy-50 text-navy-600 border border-navy-100/70">{p.method || '—'}</span></td>
+                  <td className="px-4 py-3.5"><span className={`chip ${statusStyle(p.status)}`}>{p.status === 'paid' ? "✓ To'langan" : '⏳ Kutilmoqda'}</span></td>
                 </tr>
               ))}
+              {pay.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-navy-400">To'lovlar yo'q</td></tr>}
             </tbody>
           </table>
         </div>
@@ -211,63 +239,70 @@ function StudentPanel({ user }) {
   return (
     <div>
       {/* Hero */}
-      <div className="card p-6 mb-6 bg-gradient-to-r from-navy-700 via-navy-800 to-navy-900 border-0 relative overflow-hidden">
-        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-gold/10 blur-3xl" />
-        <div className="relative flex items-center gap-4">
-          <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 text-white text-2xl font-bold shadow-lg">
-            {st.full_name[0]}
+      <div className="hero-premium card p-6 lg:p-8 mb-6 bg-gradient-to-br from-navy-700 via-navy-800 to-navy-900 border-0 rounded-[30px] shadow-[0_24px_60px_-24px_rgba(13,21,34,.5)]">
+        <div className="absolute -right-14 -top-16 w-72 h-72 rounded-full border border-white/10 animate-float" />
+        <div className="relative flex items-center gap-4 flex-wrap">
+          <div className="relative">
+            <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gold-300 via-gold-400 to-gold-600 text-white text-2xl font-extrabold shadow-lg shadow-gold/30 ring-4 ring-white/10">
+              {st.full_name[0]}
+            </div>
+            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-[3px] border-navy-800" />
           </div>
           <div>
-            <h1 className="font-display text-2xl text-white">Salom, {st.full_name.split(' ')[0]}!</h1>
-            <p className="text-navy-200 text-sm mt-0.5">{st.group_name} · {st.level}</p>
+            <div className="text-[10px] font-extrabold uppercase tracking-[.18em] text-gold-300/90 mb-1">O'quvchi paneli</div>
+            <h1 className="font-display text-2xl lg:text-[27px] text-white leading-tight">Salom, {st.full_name.split(' ')[0]}! 👋</h1>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className="chip bg-white/10 text-gold-200 border border-white/10">{st.group_name}</span>
+              <span className="chip bg-white/10 text-white border border-white/10">{st.level}</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Statistika */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="card stat-glow p-5 text-center">
-          <div className="text-3xl mb-1">🪙</div>
-          <div className="font-display text-3xl text-gold-600">{(st.coins || 0).toLocaleString()}</div>
-          <div className="text-sm text-navy-400">Coinlar</div>
+        <div className="card stat-glow card-hover p-5 text-center">
+          <div className="icon-tile w-12 h-12 bg-gradient-to-br from-gold-400/25 to-gold-100/10 text-2xl mb-2 mx-auto">🪙</div>
+          <div className="font-display text-3xl text-gold-600 tnum">{(st.coins || 0).toLocaleString()}</div>
+          <div className="text-sm text-navy-400 font-medium mt-1">Coinlar</div>
         </div>
-        <div className="card stat-glow p-5 text-center">
-          <div className="text-3xl mb-1">⚡</div>
-          <div className="font-display text-3xl text-navy-800">{(st.points || 0).toLocaleString()}</div>
-          <div className="text-sm text-navy-400">Ballar</div>
+        <div className="card stat-glow card-hover p-5 text-center">
+          <div className="icon-tile w-12 h-12 bg-gradient-to-br from-blue-400/25 to-blue-100/10 text-2xl mb-2 mx-auto">⚡</div>
+          <div className="font-display text-3xl text-navy-800 tnum">{(st.points || 0).toLocaleString()}</div>
+          <div className="text-sm text-navy-400 font-medium mt-1">Ballar</div>
         </div>
-        <div className="card stat-glow p-5 text-center">
-          <div className="text-3xl mb-1">🔥</div>
-          <div className="font-display text-3xl text-orange-600">{st.streak || 0}</div>
-          <div className="text-sm text-navy-400">Streak (kun)</div>
+        <div className="card stat-glow card-hover p-5 text-center">
+          <div className="icon-tile w-12 h-12 bg-gradient-to-br from-orange-400/25 to-orange-100/10 text-2xl mb-2 mx-auto">🔥</div>
+          <div className="font-display text-3xl text-orange-600 tnum">{st.streak || 0}</div>
+          <div className="text-sm text-navy-400 font-medium mt-1">Streak (kun)</div>
         </div>
-        <div className="card stat-glow p-5 text-center">
-          <div className="text-3xl mb-1">📈</div>
-          <div className="font-display text-3xl text-emerald-600">{st.progress || 0}%</div>
-          <div className="text-sm text-navy-400">Progress</div>
-          <div className="mt-2 h-2 rounded-full bg-navy-100 overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full" style={{ width: (st.progress || 0) + '%' }} />
+        <div className="card stat-glow card-hover p-5 text-center">
+          <div className="icon-tile w-12 h-12 bg-gradient-to-br from-emerald-400/25 to-emerald-100/10 text-2xl mb-2 mx-auto">📈</div>
+          <div className="font-display text-3xl text-emerald-600 tnum">{st.progress || 0}%</div>
+          <div className="text-sm text-navy-400 font-medium mt-1">Progress</div>
+          <div className="mt-2.5 h-2.5 rounded-full bg-navy-100 overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full shadow-inner transition-all duration-700" style={{ width: (st.progress || 0) + '%' }} />
           </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Darslar */}
-        <div className="card p-5">
-          <h3 className="font-display text-lg text-navy-800 mb-4">📚 Keyingi darslar</h3>
+        <div className="card p-5 lg:p-6">
+          <SectionTitle icon={GraduationCap} title="Keyingi darslar" extra={<ArrowRight size={15} className="text-navy-300" />} />
           {lessons.length === 0 ? (
-            <p className="text-sm text-navy-400">Hozircha darslar yo'q</p>
+            <p className="text-sm text-navy-400 text-center py-8">Hozircha darslar yo'q</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {lessons.map((l) => (
-                <div key={l.id} className="flex items-center gap-3 rounded-xl bg-navy-50/60 px-4 py-3">
-                  <span className="chip bg-blue-100 text-blue-700">{l.subject}</span>
+                <div key={l.id} className="flex items-center gap-3.5 rounded-2xl bg-navy-50/60 border border-navy-100/50 px-4 py-3.5 hover:border-gold/30 hover:bg-gold/[.04] transition-all group">
+                  <span className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400/20 to-blue-100/10 text-lg shrink-0 group-hover:scale-110 transition-transform">{l.subject?.[0] || '📘'}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-navy-800 truncate">{l.title}</div>
-                    <div className="text-xs text-navy-400">{l.date} · {l.teacher}</div>
+                    <div className="text-sm font-bold text-navy-800 truncate">{l.title}</div>
+                    <div className="text-xs text-navy-400 font-medium mt-0.5 tnum">{l.date} · {l.teacher}</div>
                   </div>
                   {l.video_url && <a href={l.video_url} target="_blank" rel="noreferrer" className="chip bg-violet-100 text-violet-700">📹 Video</a>}
-                  {l.coin_reward > 0 && <span className="chip bg-gold/10 text-gold-700">🪙 +{l.coin_reward}</span>}
+                  {l.coin_reward > 0 && <span className="chip bg-gold/10 text-gold-700 border border-gold/20">🪙 +{l.coin_reward}</span>}
                 </div>
               ))}
             </div>
@@ -275,12 +310,12 @@ function StudentPanel({ user }) {
         </div>
 
         {/* Timeline */}
-        <div className="card p-5">
-          <h3 className="font-display text-lg text-navy-800 mb-4">📜 Mening tarixim</h3>
+        <div className="card p-5 lg:p-6">
+          <SectionTitle icon={Trophy} title="Mening tarixim" />
           {timeline.length === 0 ? (
-            <p className="text-sm text-navy-400">Hozircha tarix yo'q</p>
+            <p className="text-sm text-navy-400 text-center py-8">Hozircha tarix yo'q</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4 relative before:absolute before:left-[5px] before:top-2 before:bottom-2 before:w-px before:bg-navy-100">
               {timeline.map((t) => {
                 const typeColor = {
                   enrollment: 'bg-blue-100 text-blue-700',
@@ -291,14 +326,14 @@ function StudentPanel({ user }) {
                   achievement: 'bg-rose-100 text-rose-700',
                 };
                 return (
-                  <div key={t.id} className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-gold mt-2 shrink-0" />
-                    <div>
-                      <div className="text-sm font-semibold text-navy-800">{t.event}</div>
-                      <div className="text-xs text-navy-500">{t.detail}</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`chip text-[10px] ${typeColor[t.type] || 'bg-navy-100 text-navy-600'}`}>{t.type}</span>
-                        <span className="text-[11px] text-navy-400">{t.date}</span>
+                  <div key={t.id} className="relative flex items-start gap-3.5 pl-1">
+                    <div className="relative z-10 w-3 h-3 rounded-full bg-gradient-to-br from-gold-300 to-gold-600 ring-4 ring-white mt-1.5 shrink-0 shadow-sm" />
+                    <div className="flex-1 rounded-2xl px-4 py-3 border border-navy-100/60 bg-navy-50/40 hover:bg-navy-50/80 transition">
+                      <div className="text-sm font-bold text-navy-800">{t.event}</div>
+                      <div className="text-xs text-navy-500 mt-0.5">{t.detail}</div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`chip !text-[10px] ${typeColor[t.type] || 'bg-navy-100 text-navy-600'}`}>{t.type}</span>
+                        <span className="text-[11px] text-navy-300 font-semibold tnum">{t.date}</span>
                       </div>
                     </div>
                   </div>
